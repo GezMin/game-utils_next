@@ -40,7 +40,7 @@ const Roulette = ({ numberSpin }) => {
 
     return (
         <div className={styles.app}>
-            {selectedItem && <div className={styles.result}>Selected Item: {selectedItem}</div>}
+            <div className={styles.result}>Selected Item: {selectedItem}</div>
 
             <Image src={arrImg[0].img} alt={arrImg[0].alt} width={50} height={50} />
 

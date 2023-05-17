@@ -50,9 +50,9 @@
     left: 0; Тоже укажите, иначе transition не будет работать
   
     */
-    left: 0;
+    left: 5;
     display: inline-flex;
-    transition: 15s ease;
+    transition: 3s ease;
 }
 
 .scopeHidden > ul > li {
