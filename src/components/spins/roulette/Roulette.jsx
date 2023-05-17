@@ -1,65 +1,119 @@
 'use client'
+import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import styles from './roulette.module.scss'
-import { useState, useEffect } from 'react'
 
 const arrImg = [{ id: 0, img: '/img/pointer.png', alt: 'pointer' }]
 
-const Roulette = ({ numberSpin }) => {
+const Roulette = ({ imgSpin }) => {
     const [selectedItem, setSelectedItem] = useState(null)
     const [isSpinning, setIsSpinning] = useState(false)
+    const [items, setItems] = useState([])
+
+    const cells = 41
+    const listRef = useRef(null)
+    const isSpinningRef = useRef(false)
 
     useEffect(() => {
         setSelectedItem(null)
-    }, [numberSpin])
+    }, [imgSpin])
 
-    const start = () => {
+    useEffect(() => {
+        generateItems()
+    }, [])
+
+    function getItem() {
+        let item = null
+
+        while (!item) {
+            const chance = Math.floor(Math.random() * 100)
+
+            imgSpin.forEach(elm => {
+                if (chance < elm.chance && !item) item = elm
+            })
+        }
+
+        return item
+    }
+
+    function generateItems() {
+        const newItems = []
+        for (let i = 0; i < cells; i++) {
+            const item = getItem()
+            newItems.push(item)
+        }
+        setItems(newItems)
+    }
+
+    function start() {
+        if (isSpinning) return
+
         setIsSpinning(true)
+        isSpinningRef.current = true
 
-        const scopeHidden = document.querySelector(`.${styles.scopeHidden} > ul`)
-        const listItemWidth = scopeHidden.children[0].offsetWidth
-        const numVisibleItems = Math.floor(scopeHidden.offsetWidth / listItemWidth)
+        const list = listRef.current
 
-        const targetIndex = Math.floor(Math.random() * numberSpin.length)
+        if (!list) {
+            setIsSpinning(false)
+            isSpinningRef.current = false
+            return
+        }
 
-        const move = -targetIndex * listItemWidth * numVisibleItems
-
-        scopeHidden.style.transition = 'none' // Удаляем анимацию для начала плавной прокрутки
-        scopeHidden.style.left = `${move}px`
+        // Reset list styles
+        list.style.left = '0'
+        list.style.transform = 'translate3d(0, 0, 0)'
 
         setTimeout(() => {
-            scopeHidden.style.transition = '3s ease' // Восстанавливаем анимацию
-            scopeHidden.style.left = `-${targetIndex * listItemWidth}px`
-        }, 10) // Небольшая задержка перед восстановлением анимации
+            if (!isSpinningRef.current) return
 
+            list.style.left = '50%'
+            list.style.transform = 'translate3d(-50%, 0, 0)'
+        }, 0)
+
+        const items = list.querySelectorAll('li')
+        const item = items[15]
+
+        const handleTransitionEnd = () => {
+            item.classList.add(styles.active)
+            const data = JSON.parse(item.getAttribute('data-item'))
+
+            console.log(data)
+            setSelectedItem(data.alt)
+
+            item.removeEventListener('transitionend', handleTransitionEnd)
+        }
+
+        item.addEventListener('transitionend', handleTransitionEnd)
+
+        // Reset spinning state and remove "active" class
         setTimeout(() => {
             setIsSpinning(false)
-            setSelectedItem(numberSpin[targetIndex])
-        }, 3000) // Задержка в 3 секунды перед показом результата
+            isSpinningRef.current = false
+            item.classList.remove(styles.active)
+        }, 5000) // Adjust the timing based on your animation duration
     }
 
     return (
-        <div className={styles.app}>
+        <>
             <div className={styles.result}>Selected Item: {selectedItem}</div>
+            <div className={styles.app}>
+                <Image src={arrImg[0].img} alt={arrImg[0].alt} width={50} height={50} className={styles.pointer} />
 
-            <Image src={arrImg[0].img} alt={arrImg[0].alt} width={50} height={50} />
+                <div className={styles.scope}>
+                    <ul className={styles.list} ref={listRef}>
+                        {items.map((item, i) => (
+                            <li key={i} className={styles.list__item} data-item={JSON.stringify(item)}>
+                                <Image src={item.img} alt={item.alt} width={100} height={100} />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-            <div className={styles.scopeHidden}>
-                <ul>
-                    {isSpinning ? (
-                        <li className={styles.spinPlaceholder}>
-                            <span>Spinning...</span>
-                        </li>
-                    ) : (
-                        numberSpin.map((item, i) => <li key={i}>{item}</li>)
-                    )}
-                </ul>
+                <button className={styles.start} onClick={start} disabled={isSpinning}>
+                    {isSpinning ? 'Spinning...' : 'Крутить'}
+                </button>
             </div>
-
-            <button className={styles.btn} onClick={start} disabled={isSpinning}>
-                {isSpinning ? 'Spinning...' : 'Крутить'}
-            </button>
-        </div>
+        </>
     )
 }
 
