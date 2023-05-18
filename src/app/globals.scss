@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 :root {
     --foreground-rgb: 0, 0, 0;
@@ -27,4 +27,22 @@ body {
     img {
         transform: scale(1.05);
     }
+}
+.gray {
+    border: solid 6px #666666;
+}
+.green {
+    border: solid 6px #006605;
+}
+.blue {
+    border: solid 6px #020492;
+}
+.purple {
+    border: solid 6px #3d0058;
+}
+.orange {
+    border: solid 6px #c96100;
+}
+.legendary {
+    border: solid 6px #c70000;
 }

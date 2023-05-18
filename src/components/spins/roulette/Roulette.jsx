@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import styles from './roulette.module.scss'
 
-const arrImg = [{ id: 0, img: '/img/pointer.png', alt: 'pointer' }]
+const arrImg = [{ id: 0, img: '/img/roulette/pointer.png', alt: 'pointer' }]
 
 const Roulette = ({ imgSpin }) => {
     const [selectedItem, setSelectedItem] = useState(null)
@@ -16,11 +16,8 @@ const Roulette = ({ imgSpin }) => {
 
     useEffect(() => {
         setSelectedItem(null)
-    }, [imgSpin])
-
-    useEffect(() => {
         generateItems()
-    }, [])
+    }, [imgSpin])
 
     function getItem() {
         let item = null
@@ -103,7 +100,13 @@ const Roulette = ({ imgSpin }) => {
                     <ul className={styles.list} ref={listRef}>
                         {items.map((item, i) => (
                             <li key={i} className={styles.list__item} data-item={JSON.stringify(item)}>
-                                <Image src={item.img} alt={item.alt} width={100} height={100} />
+                                <Image
+                                    src={item.img}
+                                    alt={item.alt}
+                                    width={200}
+                                    height={200}
+                                    className={item.classname}
+                                />
                             </li>
                         ))}
                     </ul>
